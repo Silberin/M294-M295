@@ -56,28 +56,9 @@
             <li>
                 <a href="add-kunde-objekt.php">
                     <i class="fa fa-user-plus"></i>
-                    <span>Create Kunde & Objekt</span>
+                    <span>Create Kunde/Objekte</span>
                 </a>
             </li>
-            <li>
-                <a href="view-kunden.php">
-                    <i class="fa fa-users"></i>
-                    <span>View Kunden & Objekte</span>
-                </a>
-            </li>
-            <li>
-                <a href="create-invoice.php">
-                    <i class="fa fa-file-invoice"></i>
-                    <span>Create Invoice</span>
-                </a>
-            </li>
-            <li>
-                <a href="view-invoices.php">
-                    <i class="fa fa-file-invoice-dollar"></i>
-                    <span>View Invoices</span>
-                </a>
-            </li>
-
         <?php } else if ($_SESSION['role'] == "manager") { ?>
             <!-- Manager Navigation -->
             <li>
@@ -104,7 +85,7 @@
         <li>
             <a href="view-kunden.php">
                 <i class="fa fa-users"></i>
-                <span>View Kunden & Objekte</span>
+                <span>View Kunden/Objekte</span>
             </a>
         </li>
 
@@ -117,7 +98,6 @@
     </ul>
 </nav>
 
-<!-- 🔹 JavaScript to Highlight the Correct Active Menu -->
 <script type="text/javascript">
     document.addEventListener("DOMContentLoaded", function() {
         var currentLocation = window.location.pathname.split('/').pop(); // Get current file name

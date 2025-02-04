@@ -63,7 +63,6 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                                                 <?= htmlspecialchars($objekt['objekt_adresse']) ?>, <?= htmlspecialchars($objekt['objekt_plz']) ?> <?= htmlspecialchars($objekt['objekt_ort']) ?>
                                                 <form action="tasks.php" method="GET" style="display:inline;">
                                                     <input type="hidden" name="objekt_id" value="<?= $objekt['objekt_id'] ?>">
-                                                    <button type="submit" class="btn btn-primary">View Objekt Tasks</button>
                                                 </form>
                                             </li>
                                         <?php } else { ?>
@@ -74,7 +73,6 @@ if (isset($_SESSION['role']) && isset($_SESSION['id'])) {
                             </td>
                             <td>
                                 <form action="tasks.php" method="GET">
-                                    <input type="hidden" name="kunde_id" value="<?= $first_kunde['id'] ?>">
                                     <button type="submit" class="btn btn-primary">View Kunde Tasks</button>
                                 </form>
                             </td>
