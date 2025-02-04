@@ -108,7 +108,16 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && ($_SESSION['role'] == 
                             <td style="text-align: right;">
                                 <a href="edit-task.php?id=<?=$task['id']?>" class="edit-btn">Edit</a>
                                 <a href="delete-task.php?id=<?=$task['id']?>" class="delete-btn">Delete</a>
+
+                                <?php if ($_SESSION['role'] == "admin") { ?>
+                                    <form action="create-invoice.php" method="GET" style="display: inline;">
+                                        <input type="hidden" name="kunde_id" value="<?= $task['assigned_to'] ?>">
+                                        <input type="hidden" name="task_id" value="<?= $task['id'] ?>">
+                                        <button type="submit" class="btn btn-warning">Invoice</button>
+                                    </form>
+                                <?php } ?>
                             </td>
+
                         </tr>
                     <?php } ?>
                 </table>

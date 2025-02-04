@@ -59,6 +59,8 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && $_SESSION['role'] == "
                 </div>
 
                 <button class="edit-btn" name="add_kunde">Add Kunde</button>
+                <br>
+                <br>
             </form>
 
             <!-- 🔹 Add Objekt Form -->
