@@ -10,7 +10,7 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && ($_SESSION['role'] == 
 
         $title = validate_input($_POST['title']);
         $description = validate_input($_POST['description']);
-        $assigned_to = validate_input($_POST['assigned_to']);
+        $assigned_to = !empty($_POST['assigned_to']) ? intval($_POST['assigned_to']) : null;
         $due_date = validate_input($_POST['due_date']);
         $kunde_id = !empty($_POST['kunde_id']) ? intval($_POST['kunde_id']) : null;
         $objekt_id = !empty($_POST['objekt_id']) ? intval($_POST['objekt_id']) : null;
@@ -86,6 +86,17 @@ if (isset($_SESSION['role']) && isset($_SESSION['id']) && ($_SESSION['role'] == 
         $stmt->execute([$title, $description, $assigned_to, $due_date, $kunde_id, $objekt_id, $image_paths_json, $document_path]);
 
         if ($stmt->rowCount() > 0) {
+            // 🔹 Insert Notification for Assigned Employee
+            if (!empty($assigned_to)) {
+                $notificationMessage = "You have been assigned a new task: $title";
+                $notificationType = "task_assignment";
+
+                $sqlNotification = "INSERT INTO notifications (user_id, message, type, is_read, date) 
+                                    VALUES (?, ?, ?, 0, NOW())";
+                $stmtNotification = $conn->prepare($sqlNotification);
+                $stmtNotification->execute([$assigned_to, $notificationMessage, $notificationType]);
+            }
+
             header("Location: ../tasks.php?success=Task created successfully.");
         } else {
             header("Location: ../create_task.php?error=Failed to create task.");

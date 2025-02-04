@@ -1,16 +1,14 @@
-<?php  
+<?php
 
-function get_all_my_notifications($conn, $id){
-	$sql = "SELECT * FROM notifications WHERE recipient=?";
-	$stmt = $conn->prepare($sql);
-	$stmt->execute([$id]);
+function get_all_my_notifications($conn, $user_id) {
+    $sql = "SELECT * FROM notifications WHERE user_id = ? ORDER BY date DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([$user_id]);
+    $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-	if($stmt->rowCount() > 0){
-		$notifications = $stmt->fetchAll();
-	}else $notifications = 0;
-
-	return $notifications;
+    return $notifications ? $notifications : []; // Return empty array if no notifications
 }
+
 
 
 function count_notification($conn, $id){
