@@ -1,8 +1,25 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Feb 04, 2025 at 09:46 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
 --
 -- Database: `task_management_db`
 --
-CREATE DATABASE IF NOT EXISTS `task_management_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `task_management_db`;
 
 -- --------------------------------------------------------
 
@@ -182,9 +199,10 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `full_name`, `username`, `password`, `role`, `created_at`) VALUES
                                                                                           (15, 'shkeli', 'admin', '$2y$10$2p22KFkOlQLxAH2uotzBceJmjU4a0kCthp39oyABD3muvyEuu3L1C', 'admin', '2025-02-02 14:45:04'),
-                                                                                          (16, 'aron', 'aron', '$2y$10$5a8jmkaFGDhm/AIGF67npevukMX28OjNsXddd7.UfkjW5dutEIlBO', 'manager', '2025-02-02 15:44:20'),
                                                                                           (17, 'Alessandro Silvercock', 'ale', '$2y$10$mGYpni86jctp59lQivYvhOD5Mda0gpElbbMXcXGA/YW.REVQa4lNG', 'employee', '2025-02-02 15:53:43'),
-                                                                                          (19, 'kenan g', 'kenang', '$2y$10$uiylrIt0bdX.yJ7sptw/nOJ0Pe0bQ6237.TbPNhxob5yX0sqjC/K2', 'employee', '2025-02-04 20:03:03');
+                                                                                          (19, 'kenan g', 'kenang', '$2y$10$uiylrIt0bdX.yJ7sptw/nOJ0Pe0bQ6237.TbPNhxob5yX0sqjC/K2', 'employee', '2025-02-04 20:03:03'),
+                                                                                          (20, 'manager', 'manager', '$2y$10$fv7r962P5IZEh4C0EJhLgONTxjfn04nP3AoO6ClRhVw/l7oz.9j9q', 'manager', '2025-02-04 20:45:25'),
+                                                                                          (21, 'employee', 'employee', '$2y$10$3l4j7q8WXyGCnEnhQsfbv.kpb3vLb2FOIzuYFslYhyOvXCxJnHjh2', 'employee', '2025-02-04 20:45:43');
 
 --
 -- Indexes for dumped tables
@@ -270,7 +288,7 @@ ALTER TABLE `tasks`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-    MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+    MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- Constraints for dumped tables
@@ -296,11 +314,6 @@ ALTER TABLE `tasks`
     ADD CONSTRAINT `fk_task_kunde` FOREIGN KEY (`kunde_id`) REFERENCES `kunde` (`id`) ON DELETE SET NULL,
     ADD CONSTRAINT `fk_task_objekt` FOREIGN KEY (`objekt_id`) REFERENCES `objekt` (`id`) ON DELETE SET NULL,
     ADD CONSTRAINT `tasks_ibfk_1` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`);
---
--- Database: `test`
---
-CREATE DATABASE IF NOT EXISTS `test` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE `test`;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
