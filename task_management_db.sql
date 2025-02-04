@@ -14,156 +14,110 @@ SET time_zone = "+00:00";
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `notifications`
---
+-- Drop the database if it already exists
+DROP DATABASE IF EXISTS task_management_db;
+CREATE DATABASE task_management_db;
+USE task_management_db;
 
-CREATE TABLE `notifications` (
-  `id` int(11) NOT NULL,
-  `message` text NOT NULL,
-  `recipient` int(11) NOT NULL,
-  `type` varchar(50) NOT NULL,
-  `date` date NOT NULL DEFAULT current_timestamp(),
-  `is_read` tinyint(1) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- 🔹 Users Table (Employees, Managers, Admins)
+CREATE TABLE users (
+                       id INT AUTO_INCREMENT PRIMARY KEY,
+                       full_name VARCHAR(255) NOT NULL,
+                       username VARCHAR(100) UNIQUE NOT NULL,
+                       password VARCHAR(255) NOT NULL,
+                       role ENUM('admin', 'manager', 'employee') NOT NULL,
+                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
---
--- Dumping data for table `notifications`
---
+-- 🔹 Kunden Table (Clients)
+CREATE TABLE kunden (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        name VARCHAR(255) NOT NULL,
+                        vorname VARCHAR(255) NOT NULL,
+                        adresse VARCHAR(255) NOT NULL,
+                        plz VARCHAR(10) NOT NULL,
+                        ort VARCHAR(100) NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-INSERT INTO `notifications` (`id`, `message`, `recipient`, `type`, `date`, `is_read`) VALUES
-(1, '\'Leckage in der Küche reparieren\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 7, 'Neue Aufgabe zugewiesen', '2025-01-21', 1),
-(2, '\'Wasserleitung im Badezimmer ersetzen\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 7, 'Neue Aufgabe zugewiesen', '2025-01-22', 1),
-(3, '\'Heizkessel warten\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 7, 'Neue Aufgabe zugewiesen', '2025-01-23', 1),
-(4, '\'Toilette reparieren\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 7, 'Neue Aufgabe zugewiesen', '2025-01-24', 0),
-(5, '\'Wasserenthärter installieren\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 2, 'Neue Aufgabe zugewiesen', '2025-01-25', 1),
-(6, '\'Abflussrohr reinigen\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 2, 'Neue Aufgabe zugewiesen', '2025-01-26', 1),
-(7, '\'Warmwasserbereiter ersetzen\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 7, 'Neue Aufgabe zugewiesen', '2025-01-27', 1),
-(8, '\'Dusche installieren\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 7, 'Neue Aufgabe zugewiesen', '2025-01-28', 0),
-(9, '\'Küchenspüle austauschen\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 2, 'Neue Aufgabe zugewiesen', '2025-01-29', 0),
-(10, '\'Wasserfilter warten\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 2, 'Neue Aufgabe zugewiesen', '2025-01-30', 0),
-(11, '\'Außenwasserhahn reparieren\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 7, 'Neue Aufgabe zugewiesen', '2025-01-31', 0),
-(12, '\'Badewanne installieren\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 2, 'Neue Aufgabe zugewiesen', '2025-02-01', 0),
-(13, '\'Kellerpumpe überprüfen\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 7, 'Neue Aufgabe zugewiesen', '2025-02-02', 0),
-(14, '\'Gasleitung überprüfen\' wurde Ihnen zugewiesen. Bitte überprüfen und beginnen Sie damit.', 2, 'Neue Aufgabe zugewiesen', '2025-02-03', 0);
+-- 🔹 Objekte Table (Linked to Kunden)
+CREATE TABLE objekte (
+                         id INT AUTO_INCREMENT PRIMARY KEY,
+                         kunde_id INT,
+                         adresse VARCHAR(255) NOT NULL,
+                         plz VARCHAR(10) NOT NULL,
+                         ort VARCHAR(100) NOT NULL,
+                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                         FOREIGN KEY (kunde_id) REFERENCES kunden(id) ON DELETE CASCADE
+);
 
--- --------------------------------------------------------
+-- 🔹 Tasks Table (Linked to Users, Kunden, and Objekte)
+CREATE TABLE tasks (
+                       id INT AUTO_INCREMENT PRIMARY KEY,
+                       title VARCHAR(255) NOT NULL,
+                       description TEXT NOT NULL,
+                       assigned_to INT NOT NULL,
+                       due_date DATE NULL,
+                       kunde_id INT NULL,
+                       objekt_id INT NULL,
+                       status ENUM('pending', 'in_progress', 'completed') DEFAULT 'pending',
+                       images JSON NULL,
+                       document VARCHAR(255) NULL,
+                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                       FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE CASCADE,
+                       FOREIGN KEY (kunde_id) REFERENCES kunden(id) ON DELETE SET NULL,
+                       FOREIGN KEY (objekt_id) REFERENCES objekte(id) ON DELETE SET NULL
+);
 
---
--- Table structure for table `tasks`
---
+-- 🔹 Notifications Table (For Task Assignment)
+CREATE TABLE notifications (
+                               id INT AUTO_INCREMENT PRIMARY KEY,
+                               user_id INT NOT NULL,
+                               message TEXT NOT NULL,
+                               type ENUM('task_assignment', 'invoice_generated', 'general') NOT NULL,
+                               is_read BOOLEAN DEFAULT FALSE,
+                               date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                               FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
 
-CREATE TABLE `tasks` (
-  `id` int(11) NOT NULL,
-  `title` varchar(100) NOT NULL,
-  `description` text DEFAULT NULL,
-  `assigned_to` int(11) DEFAULT NULL,
-  `due_date` date DEFAULT NULL,
-  `status` enum('pending','in_progress','completed') DEFAULT 'pending',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- 🔹 Invoices Table (Linked to Kunden and Tasks)
+CREATE TABLE invoices (
+                          id INT AUTO_INCREMENT PRIMARY KEY,
+                          kunde_id INT NOT NULL,
+                          task_id INT NOT NULL,
+                          total_cost DECIMAL(10,2) NOT NULL,
+                          status ENUM('pending', 'paid', 'overdue') DEFAULT 'pending',
+                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                          FOREIGN KEY (kunde_id) REFERENCES kunden(id) ON DELETE CASCADE,
+                          FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+);
 
---
--- Dumping data for table `tasks`
---
+-- 🔹 Insert Sample Data (Optional)
+INSERT INTO users (full_name, username, password, role) VALUES
+                                                            ('Admin User', 'admin', '123', 'admin'),
+                                                            ('Manager User', 'manager', '123', 'manager'),
+                                                            ('Employee User', 'employee', '123', 'employee');
 
-INSERT INTO `tasks` (`id`, `title`, `description`, `assigned_to`, `due_date`, `status`, `created_at`) VALUES
-(1, 'Leckage in der Küche reparieren', 'Überprüfen und reparieren Sie das Leck unter der Küchenspüle.', 7, '2025-01-21', 'completed', '2024-08-29 16:47:37'),
-(4, 'Wasserleitung im Badezimmer ersetzen', 'Ersetzen Sie die alte Wasserleitung im Badezimmer durch eine neue.', 7, '2025-01-22', 'completed', '2024-08-31 10:50:20'),
-(5, 'Heizkessel warten', 'Führen Sie eine jährliche Wartung des Heizkessels durch, um sicherzustellen, dass er effizient arbeitet.', 7, '2025-01-23', 'in_progress', '2024-08-31 10:50:47'),
-(6, 'Toilette reparieren', 'Beheben Sie das Problem mit der undichten Toilette im Erdgeschoss.', 7, '2025-01-24', 'pending', '2024-08-31 10:51:12'),
-(7, 'Wasserenthärter installieren', 'Installieren Sie einen neuen Wasserenthärter im Keller.', 2, '2025-01-25', 'completed', '2024-08-31 10:51:45'),
-(8, 'Abflussrohr reinigen', 'Reinigen Sie das verstopfte Abflussrohr in der Waschküche.', 2, '2025-01-26', 'pending', '2024-08-31 10:52:11'),
-(17, 'Warmwasserbereiter ersetzen', 'Ersetzen Sie den defekten Warmwasserbereiter durch ein neues Modell.', 7, '2025-01-27', 'pending', '2024-09-06 08:01:48'),
-(18, 'Dusche installieren', 'Installieren Sie eine neue Dusche im Hauptbadezimmer.', 7, '2025-01-28', 'pending', '2024-09-06 08:02:27'),
-(19, 'Küchenspüle austauschen', 'Tauschen Sie die alte Küchenspüle gegen eine neue aus.', 2, '2025-01-29', 'pending', '2024-09-06 08:02:59'),
-(20, 'Wasserfilter warten', 'Warten Sie den Wasserfilter im Hauswirtschaftsraum.', 2, '2025-01-30', 'pending', '2024-09-06 08:03:21'),
-(21, 'Außenwasserhahn reparieren', 'Reparieren Sie den undichten Außenwasserhahn im Garten.', 7, '2025-01-31', 'pending', '2024-09-06 08:03:44'),
-(22, 'Badewanne installieren', 'Installieren Sie eine neue Badewanne im Gästezimmer.', 2, '2025-02-01', 'pending', '2024-09-06 08:04:20'),
-(23, 'Kellerpumpe überprüfen', 'Überprüfen und warten Sie die Kellerpumpe, um Überschwemmungen zu verhindern.', 7, '2025-02-02', 'pending', '2024-09-06 08:04:39'),
-(24, 'Gasleitung überprüfen', 'Überprüfen Sie die Gasleitung auf Lecks und stellen Sie sicher, dass sie sicher ist.', 2, '2025-02-03', 'pending', '2024-09-06 08:04:57');
+INSERT INTO kunden (name, vorname, adresse, plz, ort) VALUES
+                                                          ('Müller', 'Hans', 'Hauptstr. 1', '10115', 'Berlin'),
+                                                          ('Schmidt', 'Anna', 'Nebenstr. 10', '50667', 'Köln');
 
--- --------------------------------------------------------
+INSERT INTO objekte (kunde_id, adresse, plz, ort) VALUES
+                                                      (1, 'Hauptstr. 1', '10115', 'Berlin'),
+                                                      (2, 'Nebenstr. 10', '50667', 'Köln');
 
---
--- Table structure for table `users`
---
+INSERT INTO tasks (title, description, assigned_to, due_date, kunde_id, objekt_id, status) VALUES
+                                                                    ('Fix Plumbing', 'Repair sink leak', 3, '2024-02-10', 1, 1, 'pending'),
+                                                                    ('Install Heater', 'Install new heating system', 3, '2024-02-15', 2, 2, 'in_progress');
 
-CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `full_name` varchar(50) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `role` enum('admin','manager','employee') NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+INSERT INTO notifications (user_id, message, type) VALUES
+                                                       (3, 'You have been assigned a new task: Fix Plumbing', 'task_assignment'),
+                                                       (3, 'You have been assigned a new task: Install Heater', 'task_assignment');
 
---
--- Dumping data for table `users`
---
+INSERT INTO invoices (kunde_id, task_id, total_cost, status) VALUES
+                                                                 (1, 1, 250.00, 'pending'),
+                                                                 (2, 2, 600.00, 'paid');
 
-INSERT INTO `users` (`id`, `full_name`, `username`, `password`, `role`, `created_at`) VALUES
-(1, 'Shkelqim', 'admin', '$2y$10$TnyR1Y43m1EIWpb0MiwE8Ocm6rj0F2KojE3PobVfQDo9HYlAHY/7O', 'admin', '2024-08-28 07:10:04'),
-(2, 'Resul', 'resul', '$2y$10$8xpI.hVCVd/GKUzcYTxLUO7ICSqlxX5GstSv7WoOYfXuYOO/SZAZ2', 'manager', '2024-08-28 07:10:40'),
-(3, 'Ivaldo', 'ivaldo', '$2y$10$7QJ8k1Z5v1E8k1Z5v1E8k1Z5v1E8k1Z5v1E8k1Z5v1E8k1Z5v1E8k1', 'employee', '2024-08-28 07:11:00'),
-(7, 'Aron', 'aron', '$2y$10$CiV/f.jO5vIsSi0Fp1Xe7ubWG9v8uKfC.VfzQr/sjb5/gypWNdlBW', 'employee', '2024-08-29 17:11:21'),
-(8, 'Eleni', 'eleni', '$2y$10$E9Xx8UCsFcw44lfXxiq/5OJtloW381YJnu5lkn6q6uzIPdL5yH3PO', 'employee', '2024-08-29 17:11:34');
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `notifications`
---
-ALTER TABLE `notifications`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `tasks`
---
-ALTER TABLE `tasks`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `assigned_to` (`assigned_to`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `notifications`
---
-ALTER TABLE `notifications`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
-
---
--- AUTO_INCREMENT for table `tasks`
---
-ALTER TABLE `tasks`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `tasks`
---
-ALTER TABLE `tasks`
-  ADD CONSTRAINT `tasks_ibfk_1` FOREIGN KEY (`assigned_to`) REFERENCES `users` (`id`);
-COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

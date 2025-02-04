@@ -24,9 +24,15 @@
 
 + Username: admin
 + Password: 123
+
+### Default Manager User:
+
++ Username: manager
++ Password: 123
+
 ### Default Employee User:
 
-+ Username: john 
++ Username: employee 
 + Password: 123
 
 ### MySQL Database:
